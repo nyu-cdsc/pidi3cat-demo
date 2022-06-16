@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<div id="videos">
+</div>
+
+<div id="startPage">
+    <div id="title">
+        <h1>This is a demonstration for Moty & Rhodes (in prep)<br> <i style="color: #63b4cf;">The role of category saliency in pragmatic inferences from generics</i></h1><br>
+        <h3>This demo provides an example of the general protocol used across Studies 1 - 3, but directly mirrors the generic condition for Study 1. That is, 
+            this demo shows the case in which participants were introduced to a social contrast with three novel groups (tomas, kitas, and gazzers), and after hearing 
+            generic statements about one group ("Zarpies are good at..."), participants were asked to reason whether that property was true of members belonging to one of 
+            the three groups.
+        </h3>
+    </div>
+
+    <div id="startButtons"> 
+        <button id='study1' type="submit" onclick="startStudy(this)">Get started!</button>
+    <!-- <button id='study2' type="submit" onclick="startStudy(this)">Study 2</button>
+    <button id='study3' type="submit" onclick="startStudy(this)">Study 3</button> -->
+    </div>
+</div>
+
+<button id='left' class='response' type="submit">Zarpies</button>
+<button id='right' class='response' type="submit">Gorps</button>
+<button id='invisible' class='invisible' type="submit">Nothing</button>
+<button id='invisible_correct' class='invisible2' type="submit">Correct</button>
+<button id='invisible_wrong' class='invisible2' type="submit">Wrong</button>
+
+<script>
+    var video_count = 0;
+    var study = 0;
+    
+    var study1_videos = ["pidi3cat_intro", "pidi3cat_check1_toma", "pidi3cat_check1_feedback_toma", "pidi3cat_check1_kita", 
+    "pidi3cat_check1_feedback_kita", "pidi3cat_check1_gazzer", "pidi3cat_check1_feedback_gazzer", "pidi3cat_check2_toma", 
+    "pidi3cat_check2_feedback_toma", "pidi3cat_check2_kita", "pidi3cat_check2_feedback_kita", "pidi3cat_check2_gazzer", 
+    "pidi3cat_check2_feedback_gazzer", "pizza_gen_toma", "pizza_kita", "pizza_toma", "pizza_gazzer", "piano_gen_toma", 
+    "piano_gazzer", "piano_toma", "piano_kita", "tree_gen_toma", "tree_toma", "tree_kita", "tree_gazzer",
+    "paint_gen_toma", "paint_gazzer", "paint_kita", "paint_toma", "pragmatics1", "pragmatics2", "pragmatics3",
+    "pragmatics4", "pragmatics5", "pragmatics6", "end"]
+
+    var study1_buttons = ["none", "invisible", "pidi3cat_check1_feedback_toma", "invisible", 
+    "pidi3cat_check1_feedback_kita", "invisible", "pidi3cat_check1_feedback_gazzer", "invisible", 
+    "pidi3cat_check2_feedback_toma", "invisible", "pidi3cat_check2_feedback_kita", "invisible", 
+    "pidi3cat_check2_feedback_gazzer", "pizza_gen_toma", "invisible", "invisible", "invisible",
+    "piano_gen_toma", "invisible", "invisible", "invisible", "tree_gen_toma", "invisible", "invisible", 
+    "invisible", "paint_gen_toma", "invisible", "invisible", "invisible", "invisible", "invisible", 
+    "invisible","invisible", "invisible", "invisible","end"]
+
+    var study2_videos = []
+
+    var study2_buttons = []
+
+    var study3_videos = []
+
+    var study3_buttons = []
+
+    var videos = [study1_videos, study2_videos, study3_videos]
+    var buttons = [study1_buttons, study2_buttons, study3_buttons]
+
+    function playVideo(param){
+        console.log(param);
+        if (video_count > 0 & param != "clean") {
+            document.getElementById(videos[study][video_count-1]).remove();
+        }
+
+        document.getElementById(videos[study][video_count]).style.visibility = "visible";
+        document.getElementById(videos[study][video_count]).play();
+        document.getElementById(videos[study][video_count]).onended = function () {
+            displayButtons();
+        }
+
+    };
+
+    function playConditionalVideo(param){
+        console.log("we entered conditional");
+        var vid = document.createElement("VIDEO");
+        vid.id =  document.getElementById(videos[study][video_count]).id + "_nk_" + param;
+        vid.src = "assets/" + document.getElementById(videos[study][video_count]).id + "_nk_" + param + ".mp4";
+        document.getElementById("videos").appendChild(vid);
+        document.getElementById(vid.id).style.visibility = "visible";
+        document.getElementById(videos[study][video_count]).remove();
+        document.getElementById(vid.id).play();
+        document.getElementById(vid.id).onended = function () {
+            video_count++;
+            console.log("this is the vid to remove", vid.id);
+            document.getElementById(vid.id).remove();
+            playVideo("clean");
+        }
+    }
+
+    function displayButtons(){
+        if (buttons[study][video_count] == "response"){
+            var bttns = document.querySelectorAll('.response')
+            bttns.forEach((value) => {
+                value.style.visibility = "visible";
+                value.onclick = function(){
+                    video_count++;
+                    bttns.forEach((value) => {
+                        value.style.visibility = "hidden";
+                    })
+                    playVideo();
+                }
+            })
+        } else if (buttons[study][video_count] == "invisible"){
+            document.querySelector('.invisible').style.visibility = "visible";
+            document.querySelector('.invisible').onclick = function(){
+                video_count++;
+                document.querySelector('.invisible').style.visibility = "hidden";
+                playVideo();
+            }
+        } else if (buttons[study][video_count] == "invisible2"){
+            var bttns = document.querySelectorAll('.invisible2');
+            bttns.forEach((value) => {
+                value.style.visibility = "visible";
+            })
+            document.getElementById('invisible_correct').onclick = function(){
+                console.log("we are inside correct", document.querySelectorAll('.invisible2'));
+                var bttns = document.querySelectorAll('.invisible2');
+                bttns.forEach((value) => {
+                        value.style.visibility = "hidden";
+                    })
+                playConditionalVideo("correct");
+            }
+            document.getElementById('invisible_wrong').onclick = function(){
+                var bttns = document.querySelectorAll('.invisible2');
+                bttns.forEach((value) => {
+                        value.style.visibility = "hidden";
+                })
+                playConditionalVideo("wrong");
+            }
+        } else if (buttons[study][video_count] == "end") {
+            location.reload();
+        } else {
+            video_count++;
+            playVideo();
+        }
+        
+    };
+
+    function makeVideos(){
+        videos[study].forEach((vids) => {
+            vid = document.createElement("VIDEO");
+            vid.id = vids;
+            vid.src = "assets/" + vids + ".mp4";
+            document.getElementById("videos").appendChild(vid);
+        })
+        playVideo();
+    }
+
+    function startStudy(bttn){
+        study = bttn.id.match(/\d+/)[0] - 1;
+        makeVideos();
+        document.getElementById("startPage").remove();
+    } 
+
+</script>
+
+</body>
+</html>
